@@ -74,6 +74,7 @@ export async function consulta(request: Request, env: Config, upstream: typeof f
   try {
     const response = await upstream(url,{ headers:{Authorization:"Bearer "+env.AIRTABLE_TOKEN}, cache:"no-store",signal:AbortSignal.timeout(10000)});
     if(response.status===429) return reply({code:"BUSY",message:"Hay varias consultas en curso. Espera 30 segundos y vuelve a intentarlo."},429,{"Retry-After":"30"});
+    if(!response.ok) console.error("Airtable request failed", response.status);
     if(!response.ok) return reply({code:"UNAVAILABLE",message:"El sistema de seguimiento no está disponible por el momento. Intenta más tarde."},502);
     const data=await response.json();
     if(!Array.isArray(data.records)) throw new Error("invalid response");
