@@ -69,7 +69,7 @@ export async function consulta(request: Request, env: Config, upstream: typeof f
   const url=new URL("https://api.airtable.com/v0/"+encodeURIComponent(env.AIRTABLE_BASE_ID)+"/"+encodeURIComponent(env.AIRTABLE_TABLE_NAME));
   url.searchParams.set("maxRecords","2");
   if(env.AIRTABLE_VIEW_NAME) url.searchParams.set("view",env.AIRTABLE_VIEW_NAME);
-  url.searchParams.set("filterByFormula",'EXACT({'+fields.folio+'}&"", "'+folio+'")');
+  url.searchParams.set("filterByFormula",'REGEX_MATCH({'+fields.folio+'}&"", "^'+folio+'$")');
   for(const name of new Set([...Object.values(fields),...Object.values(optional)].filter(Boolean))) url.searchParams.append("fields[]",name!);
   try {
     const response = await upstream(url,{ headers:{Authorization:"Bearer "+env.AIRTABLE_TOKEN}, cache:"no-store",signal:AbortSignal.timeout(10000)});
